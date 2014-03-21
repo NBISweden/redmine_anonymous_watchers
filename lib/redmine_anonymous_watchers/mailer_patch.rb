@@ -19,13 +19,13 @@ module RedmineAnonymousWatchers
     end
 
     module InstanceMethods
-      def issue_add_with_anonymous_watchers(issue)
+      def issue_add_with_anonymous_watchers(issue, to_users, cc_users)
         @subscription_recipients = issue.project.issues_recipients
-        issue_add_without_anonymous_watchers(issue)
+        issue_add_without_anonymous_watchers(issue, to_users, cc_users)
       end
-      def issue_edit_with_anonymous_watchers(journal)
+      def issue_edit_with_anonymous_watchers(journal, to_users, cc_users)
         @subscription_recipients = journal.project.issues_recipients
-        issue_edit_without_anonymous_watchers(journal)
+        issue_edit_without_anonymous_watchers(journal, to_users, cc_users)
       end
       def document_added_with_anonymous_watchers(document)
         @subscription_recipients = document.project.documents_recipients
@@ -47,9 +47,9 @@ module RedmineAnonymousWatchers
         @subscription_recipients = news.project.news_recipients
         news_added_without_anonymous_watchers(news)
       end
-      def mail_with_anonymous_watchers(headers={})
+      def mail_with_anonymous_watchers(headers={}, &block)
         headers[:cc] = (Array(headers[:cc]) + Array(@subscription_recipients) - Array(headers[:to])).uniq
-        mail_without_anonymous_watchers(headers)
+        mail_without_anonymous_watchers(headers, &block)
       end
       def create_mail_with_anonymous_watchers
         cc (Array(cc) + Array(@subscription_recipients) - Array(recipients)).uniq
