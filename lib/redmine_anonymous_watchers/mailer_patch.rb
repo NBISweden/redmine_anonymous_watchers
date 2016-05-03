@@ -20,18 +20,28 @@ module RedmineAnonymousWatchers
 
     module InstanceMethods
       def issue_add_with_anonymous_watchers(issue, to_users, cc_users)
-        @subscription_recipients = journal.issue.watcher_mails
+        if(@journal)
+          @subscription_recipients = @journal.issue.watcher_mails
+        else
+          @subscription_recipients = (to_users + cc_users).collect{|u| u.mail }
+        end
+
         issue_add_without_anonymous_watchers(issue, to_users, cc_users)
       end
       def issue_edit_with_anonymous_watchers(journal, to_users, cc_users)
-        @subscription_recipients = journal.issue.watcher_mails
-        issue = journal.journalized
-        # add check for module from project
+        # do not include anonymous watchers when private notes added
+        if(journal && !journal.private_notes?)
+          @subscription_recipients = journal.issue.watcher_mails
+          issue = journal.journalized
+        end
+        # use public link if applicable
         @public_url = nil
-        if (issue.project.module_enabled?(:semipublic_links))
-        pl = PublicLink.find_by({:issue_id => issue.id})
-        # only if pl exist and is active:
-        @public_url = url_for(action: 'resolve', controller: 'public_links', url: pl.url) if(pl && pl.active)
+        if (issue && issue.project.module_enabled?(:semipublic_links))
+          pl = PublicLink.find_by({:issue_id => issue.id})
+          # only if pl exist and is active:
+          if(pl && pl.active)
+            @public_url = url_for(action: 'resolve', controller: 'public_links', url: pl.url) 
+          end
         end
         issue_edit_without_anonymous_watchers(journal, to_users, cc_users)
       end
