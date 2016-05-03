@@ -25,6 +25,14 @@ module RedmineAnonymousWatchers
       end
       def issue_edit_with_anonymous_watchers(journal, to_users, cc_users)
         @subscription_recipients = journal.issue.watcher_mails
+        issue = journal.journalized
+        # add check for module from project
+        @public_url = nil
+        if (issue.project.module_enabled?(:semipublic_links))
+        pl = PublicLink.find_by({:issue_id => issue.id})
+        # only if pl exist and is active:
+        @public_url = url_for(action: 'resolve', controller: 'public_links', url: pl.url) if(pl && pl.active)
+        end
         issue_edit_without_anonymous_watchers(journal, to_users, cc_users)
       end
       def document_added_with_anonymous_watchers(document)
@@ -49,6 +57,7 @@ module RedmineAnonymousWatchers
       end
       def mail_with_anonymous_watchers(headers={}, &block)
         headers[:cc] = (Array(headers[:cc]) + Array(@subscription_recipients) - Array(headers[:to])).uniq
+        @issue_url = @public_url if @public_url
         mail_without_anonymous_watchers(headers, &block)
       end
       def create_mail_with_anonymous_watchers
