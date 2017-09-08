@@ -1,7 +1,12 @@
-<% html = Nokogiri::HTML.fragment(render(:parent, {:watched => watched})) %>
-<% html.at_css("h3").replace(capture do %>
-  <h3><%= l(:label_issue_watchers) %> (<%= watched.watchers.size+watched.anonymous_watchers.size %>)</h3>
-<% end) %>
-<%= raw html %>
+<% if User.current.allowed_to?(:add_issue_watchers, @project) %>
+<div class="contextual">
+<%= link_to l(:button_add),
+      {:controller => 'watchers', :action => 'new', :object_type => watched.class.name.underscore, :object_id => watched},
+      :remote => true,
+      :method => 'get' %>
+</div>
+<% end %>
 
+<h3><%= l(:label_issue_watchers) %> (<%= watched.watcher_users.size+watched.anonymous_watchers.size %>)</h3>
 
+<%= watchers_list(watched) %>

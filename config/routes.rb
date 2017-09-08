@@ -1,4 +1,9 @@
-if Redmine::VERSION::MAJOR >= 2
+if Redmine::VERSION::MAJOR >= 3
+  RedmineApp::Application.routes.draw do
+    match 'watchers/anonymous_watch', :controller=> 'watchers', :action => 'anonymous_watch', via: [:get, :post]
+    match 'watchers/anonymous_unwatch', :controller=> 'watchers', :action => 'anonymous_unwatch', via: [:get, :post]
+  end
+elsif Redmine::VERSION::MAJOR >= 2
   RedmineApp::Application.routes.draw do
     match 'watchers/anonymous_watch', :controller=> 'watchers', :action => 'anonymous_watch'
     match 'watchers/anonymous_unwatch', :controller=> 'watchers', :action => 'anonymous_unwatch'
