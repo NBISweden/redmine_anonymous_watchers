@@ -48,7 +48,7 @@ Redmine::Plugin.register :redmine_anonymous_watchers do
   author_url 'http://redmine.academ.org'
   description "Allows to add emails as watchers and subscribe to Redmine events anonymously"
   url "http://redmine.academ.org"
-  version '0.1.0'
+  version '0.2.0'
 
   permission :subscribe_anonymously, {:watchers => [:anonymous_watch, :anonymous_unwatch]}
 

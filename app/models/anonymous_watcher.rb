@@ -6,7 +6,7 @@ class AnonymousWatcher < ActiveRecord::Base
   validates_presence_of :mail
   validates_uniqueness_of :mail, :scope => [:watchable_type, :watchable_id], :allow_blank => true
   validates_format_of :mail, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i, :allow_blank => true
-  attr_accessible :watchable, :mail
+  #attr_accessible :watchable, :mail
 
   def anonymous?
     true

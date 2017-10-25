@@ -39,7 +39,10 @@ module RedmineAnonymousWatchers
                    :object_id => object.id,
                    :mail => mail}
             s << ' '
-            if Redmine::VERSION::MAJOR >= 2
+            if Redmine::VERSION::MAJOR >= 3
+              s << link_to(image_tag('delete.png'), url,
+                           :method => 'delete', :style => "vertical-align: middle", :class => "delete")
+            elsif Redmine::VERSION::MAJOR >= 2
               s << link_to(image_tag('delete.png'), url,
                            :remote => true, :method => 'delete', :style => "vertical-align: middle", :class => "delete")
             else
