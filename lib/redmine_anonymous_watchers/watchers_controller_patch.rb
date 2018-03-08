@@ -65,13 +65,18 @@ module RedmineAnonymousWatchers
       def create_with_anonymous
         if params[:watcher].is_a?(Hash) && request.post?
           mails = params[:watcher][:mails].split(/[\s,]+/) || [params[:watcher][:mail]]
+          user_ids = []
           mails.each do |mail|
-            #AnonymousWatcher.create(:watchable => @watched, :watchable_type => params["object_type"], :mail => mail) if mail.present?
-           @watchables.each do |watchable|
-             AnonymousWatcher.create(:watchable => watchable, :mail => mail) if mail.present?
-           end
+            if(u = User.find_by_mail(mail))
+              user_ids << u.id
+            else	
+              @watchables.each do |watchable|
+	         AnonymousWatcher.create(:watchable => watchable, :mail => mail) if mail.present?
+               end
+            end
           end
         end
+        params[:watcher][:user_ids] = user_ids unless user_ids.empty?
         create_without_anonymous
       end
 
