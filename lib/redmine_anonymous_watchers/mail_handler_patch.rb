@@ -13,9 +13,9 @@ module RedmineAnonymousWatchers
       def add_watchers_with_anonymous(obj)
         add_watchers_without_anonymous(obj)
         if handler_options[:no_permission_check] || user.allowed_to?("add_#{obj.class.name.underscore}_watchers".to_sym, obj.project)
-          addresses = [email.to, email.cc].flatten.compact.uniq.collect {|a| a.strip.downcase}
-          addresses -= Setting.plugin_redmine_anonymous_watchers[:ignore_emails].downcase.split(/[\s,]+/)
-          addresses -= [redmine_emission_address.downcase]
+          addresses = [email.to, email.cc].flatten.compact.uniq.collect {|a| a.strip.to_s.downcase}
+          addresses -= Setting.plugin_redmine_anonymous_watchers[:ignore_emails].to_s.downcase.split(/[\s,]+/)
+          addresses -= [redmine_emission_address.to_s.downcase]
           addresses -= obj.watcher_users.map(&:mail)
           # do not add addresses connected to a user account, or existing watchers
           addresses.delete_if{|a| User.find_by_mail(a) || obj.watcher_mails.include?(a)}
