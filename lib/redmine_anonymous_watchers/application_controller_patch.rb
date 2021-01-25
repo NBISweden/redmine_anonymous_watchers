@@ -5,7 +5,7 @@ module RedmineAnonymousWatchers
     def self.included(base)
       base.send(:include, InstanceMethods)
       base.class_eval do
-        before_filter :generate_anonymous_token
+        before_action :generate_anonymous_token
       end
     end
 
