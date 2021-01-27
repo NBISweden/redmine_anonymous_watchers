@@ -7,6 +7,7 @@ module RedmineAnonymousWatchers
       base.class_eval do
         alias_method :watchers_checkboxes, :watchers_checkboxes_with_anonymous
         alias_method :watchers_list, :watchers_list_with_anonymous
+        alias_method :watcher_link_without_anonymous, :watcher_link
         alias_method :watcher_link, :watcher_link_with_anonymous
       end
     end
