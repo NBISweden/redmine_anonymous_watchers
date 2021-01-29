@@ -5,14 +5,21 @@ module RedmineAnonymousWatchers
     def self.included(base)
       base.send(:include, InstanceMethods)
       base.class_eval do
+        alias_method :issue_add_without_anonymous_watchers, :issue_add
         alias_method :issue_add, :issue_add_with_anonymous_watchers
+        alias_method :issue_edit_without_anonymous_watchers, :issue_edit
         alias_method :issue_edit, :issue_edit_with_anonymous_watchers
+        alias_method :document_added_without_anonymous_watchers, :document_added
         alias_method :document_added, :document_added_with_anonymous_watchers
+        alias_method :attachments_added_without_anonymous_watchers, :attachments_added
         alias_method :attachments_added, :attachments_added_with_anonymous_watchers
+        alias_method :news_added_without_anonymous_watchers, :news_added
         alias_method :news_added, :news_added_with_anonymous_watchers
         if Redmine::VERSION::MAJOR < 2
+          alias_method :create_mail_without_anonymous_watchers, :create_mail
           alias_method :create_mail, :create_mail_with_anonymous_watchers
         else
+          alias_method :mail_without_anonymous_watchers, :mail
           alias_method :mail, :mail_with_anonymous_watchers
         end
       end

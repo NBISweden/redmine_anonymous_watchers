@@ -6,14 +6,18 @@ module RedmineAnonymousWatchers
       base::ClassMethods.send(:include, ClassMethods)
       base::ClassMethods.module_eval do
         alias_method :acts_as_watchable_without_anonymous, :acts_as_watchable
+        alias_method :acts_as_watchable, :acts_as_watchable_with_anonymous
       end
 
       base::InstanceMethods.send(:include, InstanceMethods)
       base::InstanceMethods.module_eval do
+        alias_method :add_watcher_without_anonymous, :add_watcher
         alias_method :add_watcher, :add_watcher_with_anonymous
+        alias_method :remove_watcher_without_anonymous, :remove_watcher
         alias_method :remove_watcher, :remove_watcher_with_anonymous
+        alias_method :watched_by_without_anonymous?, :watched_by?
         alias_method :watched_by?, :watched_by_with_anonymous?
-        #alias_method :watched_by_without_anonymous?, :watched_by?
+        alias_method :watcher_recipients_without_anonymous, :watcher_recipients
         alias_method :watcher_recipients, :watcher_recipients_with_anonymous
 
         def watcher_mails
