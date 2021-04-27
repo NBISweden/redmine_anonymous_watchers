@@ -5,9 +5,12 @@ module RedmineAnonymousWatchers
     def self.included(base)
       base.send(:include, InstanceMethods)
       base.class_eval do
-        alias_method_chain :watchers_checkboxes, :anonymous
-        alias_method_chain :watchers_list, :anonymous
-        alias_method_chain :watcher_link, :anonymous
+        alias_method :watchers_checkboxes_without_anonymous, :watchers_checkboxes
+        alias_method :watchers_checkboxes, :watchers_checkboxes_with_anonymous
+        alias_method :watchers_list_without_anonymous, :watchers_list
+        alias_method :watchers_list, :watchers_list_with_anonymous
+        alias_method :watcher_link_without_anonymous, :watcher_link
+        alias_method :watcher_link, :watcher_link_with_anonymous
       end
     end
     module InstanceMethods
