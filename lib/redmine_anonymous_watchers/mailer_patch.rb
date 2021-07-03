@@ -5,10 +5,8 @@ module RedmineAnonymousWatchers
     def self.included(base)
       base.send(:include, InstanceMethods)
       base.class_eval do
-        alias_method :issue_add_without_anonymous_watchers, :issue_add
-        alias_method :issue_add, :issue_add_with_anonymous_watchers
-        alias_method :issue_edit_without_anonymous_watchers, :issue_edit
-        alias_method :issue_edit, :issue_edit_with_anonymous_watchers
+        alias_method :deliver_issue_add, :deliver_issue_add_with_anonymous_watchers
+        alias_method :deliver_issue_edit, :deliver_issue_edit_with_anonymous_watchers
         alias_method :document_added_without_anonymous_watchers, :document_added
         alias_method :document_added, :document_added_with_anonymous_watchers
         alias_method :attachments_added_without_anonymous_watchers, :attachments_added
@@ -26,19 +24,27 @@ module RedmineAnonymousWatchers
     end
 
     module InstanceMethods
-      def issue_add_with_anonymous_watchers(issue, to_users, cc_users)
+      def deliver_issue_add_with_anonymous_watchers(issue)
+        users = issue.notified_users | issue.notified_watchers
+
         if(@journal)
           @subscription_recipients = @journal.issue.watcher_mails
         else
-          @subscription_recipients = (to_users + cc_users).collect{|u| u.mail }
+          @subscription_recipients = (users).collect{|u| u.mail }
         end
 
-        issue_add_without_anonymous_watchers(issue, to_users, cc_users)
+        users.each do |user|
+          issue_add(user, issue).deliver_later
+        end
       end
-      def issue_edit_with_anonymous_watchers(journal, to_users, cc_users)
-        # do not include anonymous watchers when private notes added
+
+      def deliver_issue_edit_with_anonymous_watchers(journal)
+        @subscription_recipients = journal.issue.watcher_mails
+        @subscription_recipients.select! do |user|
+          journal.notes? || journal.visible_details(user).any?
+        end
+
         if(journal && !journal.private_notes?)
-          @subscription_recipients = journal.issue.watcher_mails
           issue = journal.journalized
         end
         # use public link if applicable
@@ -50,8 +56,16 @@ module RedmineAnonymousWatchers
             @public_url = url_for(action: 'resolve', controller: 'public_links', url: pl.url) 
           end
         end
-        issue_edit_without_anonymous_watchers(journal, to_users, cc_users)
+
+        users  = journal.notified_users | journal.notified_watchers
+        users.select! do |user|
+          journal.notes? || journal.visible_details(user).any?
+        end
+        users.each do |user|
+          issue_edit(user, journal).deliver_later
+        end
       end
+
       def document_added_with_anonymous_watchers(document)
         @subscription_recipients = document.project.documents_recipients
         document_added_without_anonymous_watchers(document)

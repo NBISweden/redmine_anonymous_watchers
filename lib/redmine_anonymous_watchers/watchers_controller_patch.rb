@@ -79,7 +79,7 @@ module RedmineAnonymousWatchers
             end
           end
         end
-        params[:watcher][:user_ids] = user_ids unless user_ids.empty?
+        params[:watcher][:user_ids] = user_ids unless (user_ids.nil? || user_ids.empty?)
         create_without_anonymous
       end
 
