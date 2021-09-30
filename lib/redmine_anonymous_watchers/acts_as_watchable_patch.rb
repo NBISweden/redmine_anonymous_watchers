@@ -57,7 +57,7 @@ module RedmineAnonymousWatchers
         when User
           remove_watcher_without_anonymous(obj)
         when String
-          AnonymousWatcher.delete_all(:watchable_type => self.class.name, :watchable_id => self.id, :mail => obj)
+          AnonymousWatcher.where(:watchable_type => self.class.name, :watchable_id => self.id, :mail => obj).delete_all
         when AnonymousWatcher
           AnonymousWatcher.delete_all({:watchable_type => self.class.name, :watchable_id => self.id}.merge(
                                           obj.anonymous_token ? {:anonymous_token => obj.anonymous_token} : {:mail => obj.mail}))
