@@ -5,8 +5,11 @@ module RedmineAnonymousWatchers
     def self.included(base)
       base.send(:include, InstanceMethods)
       base.class_eval do
-        alias_method :deliver_issue_add, :deliver_issue_add_with_anonymous_watchers
-        alias_method :deliver_issue_edit, :deliver_issue_edit_with_anonymous_watchers
+        alias_method :issue_add_without_anonymous_watchers, :issue_add
+        alias_method :issue_add, :issue_add_with_anonymous_watchers
+        alias_method :issue_edit_without_anonymous_watchers, :issue_edit
+        alias_method :issue_edit, :issue_edit_with_anonymous_watchers
+
         alias_method :document_added_without_anonymous_watchers, :document_added
         alias_method :document_added, :document_added_with_anonymous_watchers
         alias_method :attachments_added_without_anonymous_watchers, :attachments_added
@@ -24,21 +27,23 @@ module RedmineAnonymousWatchers
     end
 
     module InstanceMethods
-      def deliver_issue_add_with_anonymous_watchers(issue)
+      def issue_add_with_anonymous_watchers(user, issue)
         users = issue.notified_users | issue.notified_watchers
-
+        
+        puts "users"
+        puts issue.notified_users
+        puts "watchers"
+        puts issue.notified_watchers
         if(@journal)
           @subscription_recipients = @journal.issue.watcher_mails
         else
           @subscription_recipients = (users).collect{|u| u.mail }
         end
-
-        users.each do |user|
-          issue_add(user, issue).deliver_later
-        end
+        
+        issue_add_without_anonymous_watchers(user, issue)
       end
 
-      def deliver_issue_edit_with_anonymous_watchers(journal)
+      def issue_edit_with_anonymous_watchers(user, journal)
         @subscription_recipients = journal.issue.watcher_mails
         @subscription_recipients.select! do |user|
           journal.notes? || journal.visible_details(user).any?
@@ -57,13 +62,8 @@ module RedmineAnonymousWatchers
           end
         end
 
-        users  = journal.notified_users | journal.notified_watchers
-        users.select! do |user|
-          journal.notes? || journal.visible_details(user).any?
-        end
-        users.each do |user|
-          issue_edit(user, journal).deliver_later
-        end
+        issue_edit_without_anonymous_watchers(user, journal)
+        
       end
 
       def document_added_with_anonymous_watchers(document)
