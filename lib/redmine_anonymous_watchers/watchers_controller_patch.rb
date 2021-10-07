@@ -64,7 +64,10 @@ module RedmineAnonymousWatchers
         if params[:watcher].key?(:mails)
           @watcher_mails = params[:watcher][:mails].split(/[\s,]+/) || [params[:watcher][:mail]]
         end
-        append_without_anonymous
+        if params[:watcher]
+          user_ids = params[:watcher][:user_ids] || [params[:watcher][:user_id]]
+          @users = Principal.assignable_watchers.where(:id => user_ids).to_a
+        end
       end
 
       def create_with_anonymous

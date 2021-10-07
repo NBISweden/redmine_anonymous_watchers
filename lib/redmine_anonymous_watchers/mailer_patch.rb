@@ -28,16 +28,12 @@ module RedmineAnonymousWatchers
 
     module InstanceMethods
       def issue_add_with_anonymous_watchers(user, issue)
-        users = issue.notified_users | issue.notified_watchers
+        users = issue.notified_users | issue.notified_watchers 
         
-        puts "users"
-        puts issue.notified_users
-        puts "watchers"
-        puts issue.notified_watchers
         if(@journal)
           @subscription_recipients = @journal.issue.watcher_mails
         else
-          @subscription_recipients = (users).collect{|u| u.mail }
+          @subscription_recipients = (users).collect{|u| u.mail } | issue.watcher_mails
         end
         
         issue_add_without_anonymous_watchers(user, issue)
