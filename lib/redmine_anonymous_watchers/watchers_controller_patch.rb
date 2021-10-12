@@ -78,7 +78,7 @@ module RedmineAnonymousWatchers
           mails.each do |mail|
             if(u = User.find_by_mail(mail))
               user_ids << u.id
-            else	
+            else
               @watchables.each do |watchable|
                 AnonymousWatcher.create(:watchable => watchable, :mail => mail) if mail.present?
                end

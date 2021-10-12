@@ -59,7 +59,7 @@ module RedmineAnonymousWatchers
         when String
           AnonymousWatcher.where(:watchable_type => self.class.name, :watchable_id => self.id, :mail => obj).delete_all
         when AnonymousWatcher
-          filter = obj.anonymous_token ? {:anonymous_token => obj.anonymous_token} : {:mail => obj.mail}  
+          filter = obj.anonymous_token ? {:anonymous_token => obj.anonymous_token} : {:mail => obj.mail}
           AnonymousWatcher.where({:watchable_type => self.class.name, :watchable_id => self.id}.merge(filter)).delete_all
         end
       end
