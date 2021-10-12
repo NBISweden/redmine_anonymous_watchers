@@ -40,13 +40,13 @@ module RedmineAnonymousWatchers
       end
 
       def issue_edit_with_anonymous_watchers(user, journal)
-        @subscription_recipients = journal.issue.watcher_mails
-        @subscription_recipients.select! do |user|
-          journal.notes? || journal.visible_details(user).any?
-        end
-
+        # do not include anonymous watchers when private notes added
         if(journal && !journal.private_notes?)
           issue = journal.journalized
+          @subscription_recipients = journal.issue.watcher_mails
+          @subscription_recipients.select! do |user|
+            journal.notes? || journal.visible_details(user).any?
+          end
         end
         # use public link if applicable
         @public_url = nil
