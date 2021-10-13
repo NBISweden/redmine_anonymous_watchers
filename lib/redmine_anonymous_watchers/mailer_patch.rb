@@ -7,8 +7,8 @@ module RedmineAnonymousWatchers
       base.class_eval do
         alias_method :issue_add_without_anonymous_watchers, :issue_add
         alias_method :issue_add, :issue_add_with_anonymous_watchers
-        alias_method :issue_edit_without_anonymous_watchers, :issue_edit
-        alias_method :issue_edit, :issue_edit_with_anonymous_watchers
+        #alias_method :issue_edit_without_anonymous_watchers, :issue_edit
+        #alias_method :issue_edit, :issue_edit_with_anonymous_watchers
 
         alias_method :document_added_without_anonymous_watchers, :document_added
         alias_method :document_added, :document_added_with_anonymous_watchers

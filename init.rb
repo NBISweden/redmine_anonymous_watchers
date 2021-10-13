@@ -14,6 +14,7 @@ to_prepare = Proc.new do
   end
   unless Mailer.include?(RedmineAnonymousWatchers::MailerPatch)
     Mailer.send :include, RedmineAnonymousWatchers::MailerPatch
+    Mailer.singleton_class.send :prepend, RedmineAnonymousWatchers::MailerExtension
   end
   unless WatchersController.include?(RedmineAnonymousWatchers::WatchersControllerPatch)
     WatchersController.send :include, RedmineAnonymousWatchers::WatchersControllerPatch
