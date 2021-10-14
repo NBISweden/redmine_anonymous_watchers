@@ -2,8 +2,9 @@ module RedmineAnonymousWatchers
   module MailerExtension
     #unloadable
 
+    
+
     def deliver_issue_edit(journal)
-      (1..20).each do puts "new extension" end
 
       if (journal && !journal.private_notes?)
         recipients = journal.issue.watcher_mails
@@ -11,19 +12,29 @@ module RedmineAnonymousWatchers
           journal.notes? || journal.visible_details(user).any?
         end
         recipients.each do |user|
-          (1..20).each do puts "Send Mail" end
           puts user
-          # The issue_edit wants a User object, this was one way I tried to create one that didn't succeed all the way.
-          #u = User.new
-          ##u.name = user
-          #u.mail = user
-          #u.id = 0xdeadbeef
+          unless user.is_a?(User)
+            mail = user
+            user = User.new
+            names = mail.gsub(/@.*$/, '').split('.')
+            user.login = mail
+            user.firstname = names
+            user.lastname = '-'
+            user.language = Setting.default_language
+            user.generate_password = true
+            user.mail_notification = 'only_my_events'
+            user.mail = mail
+            user.save!
+          end
+
           issue_edit(user, journal).deliver_later
         end
       end
 
       super
     end
+
+    
   end
 end
 
