@@ -2,6 +2,16 @@ module RedmineAnonymousWatchers
   module MailerExtension
     #unloadable
 
+    def find_or_create_group()
+      group = Group.find_by(:lastname => "Anonymous Watchers")
+      if ! group
+        group = Group.new()
+        group.name = "Anonymous Watchers"
+        group.save!
+      end
+      group
+    end
+
     def create_user(mail)
       user = User.new
       names = mail.gsub(/@.*$/, '')
@@ -15,6 +25,10 @@ module RedmineAnonymousWatchers
       user.generate_password = true
       user.mail_notification = 'none'
       user.mail = mail
+
+      group = find_or_create_group()
+      group.users << user
+
       user.save!
       user.lock!
       user
