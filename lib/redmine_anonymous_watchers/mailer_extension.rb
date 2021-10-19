@@ -29,7 +29,8 @@ module RedmineAnonymousWatchers
           user = create_user(mail) unless user
         end
         issue_add(user, issue).deliver_later
-      end      
+      end
+      super
     end
             
 
@@ -50,6 +51,7 @@ module RedmineAnonymousWatchers
           issue_edit(user, journal).deliver_later
         end
       end
+      super
     end
 
   end
