@@ -19,7 +19,7 @@ module RedmineAnonymousWatchers
       user.lock!
       user
     end
-    
+
     def deliver_issue_add(issue)
       users = issue.watcher_mails
       users.each do |user|
@@ -32,10 +32,9 @@ module RedmineAnonymousWatchers
       end
       super
     end
-            
+
 
     def deliver_issue_edit(journal)
-
       if (journal && !journal.private_notes?)
         recipients = journal.issue.watcher_mails
         recipients.select! do |user|
