@@ -13,7 +13,7 @@ module RedmineAnonymousWatchers
       user.lastname = names_list[1]
       user.language = Setting.default_language
       user.generate_password = true
-      user.mail_notification = 'only_my_events'
+      user.mail_notification = 'none'
       user.mail = mail
       user.save!
       user.lock!
