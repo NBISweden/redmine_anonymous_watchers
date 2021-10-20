@@ -78,8 +78,6 @@ module RedmineAnonymousWatchers
       end
       def mail_with_anonymous_watchers(headers={}, &block)
         headers[:cc] = (Array(headers[:cc]) + Array(@subscription_recipients) - Array(headers[:to])).uniq
-        puts headers
-        puts block
         @issue_url = @public_url if @public_url
         mail_without_anonymous_watchers(headers, &block)
       end

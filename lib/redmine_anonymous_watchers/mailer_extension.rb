@@ -17,11 +17,10 @@ module RedmineAnonymousWatchers
     end
 
     def create_user(mail)
-      user = User.new
       names = mail.gsub(/@.*$/, '')
-      puts names
-      puts names.class
       names_list = names.include?(".") ? names.split('.') : [names, '-']
+
+      user = User.new
       user.login = mail
       user.firstname = names_list[0]
       user.lastname = names_list[1]
