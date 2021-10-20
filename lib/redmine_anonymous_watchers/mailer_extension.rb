@@ -1,6 +1,5 @@
 module RedmineAnonymousWatchers
   module MailerExtension
-    #unloadable
 
     def find_or_create_group()
       group = Group.find_by(:lastname => "Anonymous Watchers")
