@@ -1,6 +1,12 @@
 module RedmineAnonymousWatchers
   module MailerExtension
 
+    def find_or_create_user(mail)
+      user = User.find_by_mail(mail)
+      user = create_user(mail) unless user
+      user
+    end
+
     def find_or_create_group()
       group = Group.find_by(:lastname => "Anonymous Watchers")
       if ! group
@@ -36,12 +42,11 @@ module RedmineAnonymousWatchers
       users = issue.watcher_mails
       users.each do |user|
         unless user.is_a?(User)
-          mail = user
-          user = User.find_by_mail(mail)
-          user = create_user(mail) unless user
+          user = find_or_create_user(user)
         end
         issue_add(user, issue).deliver_later
       end
+
       super
     end
 
@@ -53,18 +58,15 @@ module RedmineAnonymousWatchers
           journal.notes? || journal.visible_details(user).any?
         end
         recipients.each do |user|
-          puts user
           unless user.is_a?(User)
-            mail = user
-            user = User.find_by_mail(mail)
-            user = create_user(mail) unless user
+            user = find_or_create_user(user)
           end
           issue_edit(user, journal).deliver_later
         end
       end
+
       super
     end
 
   end
 end
-
