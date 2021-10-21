@@ -7,7 +7,6 @@ module RedmineAnonymousWatchers
       if ! group
         group = Group.new()
         group.name = "Anonymous Watchers"
-        group.save!
       end
       group
     end
@@ -28,9 +27,9 @@ module RedmineAnonymousWatchers
 
       group = find_or_create_group()
       group.users << user
-
-      user.save!
+      group.save!
       user.lock!
+      user.save!
       user
     end
 

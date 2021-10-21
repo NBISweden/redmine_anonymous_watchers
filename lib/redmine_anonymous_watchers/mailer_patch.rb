@@ -77,7 +77,6 @@ module RedmineAnonymousWatchers
         news_added_without_anonymous_watchers(news)
       end
       def mail_with_anonymous_watchers(headers={}, &block)
-        puts "mail_with_anonymous_watchers!!!!!!!!!!!!!!!!1"
         headers[:cc] = (Array(headers[:cc]) + Array(@subscription_recipients) - Array(headers[:to])).uniq
         puts headers
         puts block
