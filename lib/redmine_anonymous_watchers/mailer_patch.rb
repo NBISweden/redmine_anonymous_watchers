@@ -15,17 +15,17 @@ module RedmineAnonymousWatchers
 
     module InstanceMethods
       def issue_edit_with_anonymous_watchers(user, journal)
-        
+        @public_url = nil
         if(journal && !journal.private_notes?)
           issue = journal.journalized
-        end
-        # use public link if applicable
-        @public_url = nil
-        if (issue && issue.project.module_enabled?(:semipublic_links))
-          pl = PublicLink.find_by({:issue_id => issue.id})
-          # only if pl exist and is active:
-          if(pl && pl.active)
-            @public_url = url_for(action: 'resolve', controller: 'public_links', url: pl.url) 
+
+          # use public link if applicable
+          if (issue.project.module_enabled?(:semipublic_links))
+            pl = PublicLink.find_by({:issue_id => issue.id})
+            # only if pl exist and is active:
+            if(pl && pl.active)
+              @public_url = url_for(action: 'resolve', controller: 'public_links', url: pl.url)
+            end
           end
         end
 
