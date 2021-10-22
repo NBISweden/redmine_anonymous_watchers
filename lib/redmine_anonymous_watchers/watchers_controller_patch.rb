@@ -1,3 +1,5 @@
+
+
 module RedmineAnonymousWatchers
   module WatchersControllerPatch
     unloadable
@@ -59,27 +61,31 @@ module RedmineAnonymousWatchers
       end
 
       def append_with_anonymous
-        if params[:watcher].is_a?(Hash)
+        if params[:watcher].key?(:mails)
           @watcher_mails = params[:watcher][:mails].split(/[\s,]+/) || [params[:watcher][:mail]]
         end
-        append_without_anonymous
+        if params[:watcher]
+          user_ids = params[:watcher][:user_ids] || [params[:watcher][:user_id]]
+          @users = Principal.assignable_watchers.where(:id => user_ids).to_a
+        end
       end
 
       def create_with_anonymous
-        if params[:watcher].is_a?(Hash) && request.post?
-          mails = params[:watcher][:mails].split(/[\s,]+/) || [params[:watcher][:mail]]
+        watcher = params[:watcher]
+        if watcher.key?(:mails) && request.post?
+          mails = watcher[:mails].split(/[\s,]+/) || [watcher[:mail]]
           user_ids = []
           mails.each do |mail|
             if(u = User.find_by_mail(mail))
               user_ids << u.id
-            else	
+            else
               @watchables.each do |watchable|
-	         AnonymousWatcher.create(:watchable => watchable, :mail => mail) if mail.present?
+                AnonymousWatcher.create(:watchable => watchable, :mail => mail) if mail.present?
                end
             end
           end
         end
-        params[:watcher][:user_ids] = user_ids unless user_ids.empty?
+        params[:watcher][:user_ids] = user_ids unless (user_ids.nil? || user_ids.empty?)
         create_without_anonymous
       end
 
