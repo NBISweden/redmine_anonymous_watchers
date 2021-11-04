@@ -32,11 +32,12 @@ module RedmineAnonymousWatchers
           end
         end
 
-        self.receive_without_anonymous(email, options=options)
+        return_value = self.receive_without_anonymous(email, options=options)
 
         if deactivate_user
           user.lock!
         end
+        return return_value
       end
 
       def add_watchers_with_anonymous(obj)
