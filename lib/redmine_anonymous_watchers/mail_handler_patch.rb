@@ -7,10 +7,39 @@ module RedmineAnonymousWatchers
       base.class_eval do
         alias_method :add_watchers_without_anonymous, :add_watchers
         alias_method :add_watchers, :add_watchers_with_anonymous
+
+        alias_method :receive_without_anonymous, :receive
+        alias_method :receive, :receive_with_anonymous
       end
     end
 
     module InstanceMethods
+      def receive_with_anonymous(email, options={})
+        # The only check we do here is whether it's an anonymous watcher, and
+        # if so we temporarily activate the user for the duration of the recieve
+        # code.
+        #
+        # We have to use the mutating! versions that update the database since
+        # the original receive code will fetch it again.
+
+        deactivate_user = false
+        sender_email = email.from.to_a.first.to_s.strip
+        user = User.find_by_mail(sender_email) if sender_email.present?
+        if user && !user.active?
+          if user.groups.any? { |group| group.name == 'Anonymous Watchers' }
+            user.activate!
+            deactivate_user = true
+          end
+        end
+
+        return_value = self.receive_without_anonymous(email, options=options)
+
+        if deactivate_user
+          user.lock!
+        end
+        return return_value
+      end
+
       def add_watchers_with_anonymous(obj)
         add_watchers_without_anonymous(obj)
         if handler_options[:no_permission_check] || user.allowed_to?("add_#{obj.class.name.underscore}_watchers".to_sym, obj.project)
