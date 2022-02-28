@@ -76,12 +76,19 @@ module RedmineAnonymousWatchers
           mails = watcher[:mails].split(/[\s,]+/) || [watcher[:mail]]
           user_ids = []
           mails.each do |mail|
-            if(u = User.find_by_mail(mail))
-              user_ids << u.id
-            else
+            add_anonymous = false
+
+            u = User.find_by_mail(mail)
+            if !u || (u.is_a?(User) && u.groups.any? { |group| group.name == 'Anonymous Watchers' })
+              add_anonymous = true
+            end
+
+            if add_anonymous
               @watchables.each do |watchable|
                 AnonymousWatcher.create(:watchable => watchable, :mail => mail) if mail.present?
                end
+            else
+              user_ids << u.id
             end
           end
         end
